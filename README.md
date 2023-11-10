@@ -1,2 +1,2 @@
 # LoRa_Comunication
-ASM project | Loca comunication between temperature sensor &amp; TTN
+ASM project | Lora comunication between temperature sensor connected with an esp32, a gateway esp32 and a TTN
