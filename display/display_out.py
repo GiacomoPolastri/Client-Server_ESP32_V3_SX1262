@@ -1,35 +1,37 @@
 import time
 from machine import Pin, SoftI2C
-import ssd1306
+from ssd1306 import SSD1306_I2C
 
-# Heltec LoRa 32 with OLED Display
-width = 128
-height = 64
+# Costanti per la configurazione
+SET_OLED_WIDTH = 128
+SET_OLED_HEIGHT = 64
+SET_RST = 21
+SET_SCL = 18
+SET_SDA = 17
 
-#Set Pins
-rst = 21
-scl = 18
-sda = 17
+class DISPLAY_OUT:
+    def __init__(self, *rows):
+        self.rows = rows
+        self.display_out()
 
-# OLED reset pin
-i2c_rst = Pin(rst, Pin.OUT)
-# Initialize the OLED display
-i2c_rst.value(0)
-time.sleep_ms(5)
-i2c_rst.value(1)  # must be held high after initialization
+    def display_out(self):
+        i2c_rst = Pin(SET_RST, Pin.OUT)
+        i2c_rst.value(0)
+        time.sleep_ms(5)
+        i2c_rst.value(1)
 
-# Setup the I2C lines
-i2c_scl = Pin(scl, Pin.OUT, Pin.PULL_UP)
-i2c_sda = Pin(sda, Pin.OUT, Pin.PULL_UP)
+        i2c_scl = Pin(SET_SCL, Pin.OUT, Pin.PULL_UP)
+        i2c_sda = Pin(SET_SDA, Pin.OUT, Pin.PULL_UP)
 
-# Create the SoftI2C object
-i2c = SoftI2C(scl=i2c_scl, sda=i2c_sda)
+        # Create the SoftI2C object
+        i2c = SoftI2C(scl=i2c_scl, sda=i2c_sda)
 
-# Create the display object
-oled = ssd1306.SSD1306_I2C(width, height, i2c)
+        # Create the display object
+        oled = SSD1306_I2C(SET_OLED_WIDTH, SET_OLED_HEIGHT, i2c)
 
-def dispaly_out(text):
-    oled.fill(0)
-    oled.text('text', 0, 15)
-    oled.show()
-    return print('done')
+        oled.fill(0)
+        y = 0
+        for row in self.rows:
+            oled.text(row, 0, y)
+            y += 20
+        oled.show()
