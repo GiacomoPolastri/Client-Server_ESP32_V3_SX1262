@@ -1,6 +1,6 @@
 import time
 from machine import Pin, SoftI2C
-from ssd1306 import SSD1306_I2C
+from display.ssd1306 import SSD1306_I2C
 
 # Costanti per la configurazione
 SET_OLED_WIDTH = 128
