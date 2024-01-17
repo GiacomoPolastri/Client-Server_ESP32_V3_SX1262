@@ -8,61 +8,52 @@ from display.display_out import DISPLAY_OUT
 import urequests as requests
 import network
 import ujson as json
-'''
-ADC_MODE_VCC = 255
-ADC_MODE_ADC = 0
 
-def set_adc_mode(mode):
-    sector_size = bdev.SEC_SIZE
-    flash_size = esp.flash_size() # device dependent
-    init_sector = int(flash_size / sector_size - 4)
-    data = bytearray(esp.flash_read(init_sector * sector_size, sector_size))
-    if data[107] == mode:
-        return  # flash is already correct; nothing to do
-    else:
-        data[107] = mode  # re-write flash
-        esp.flash_erase(init_sector)
-        esp.flash_write(init_sector * sector_size, data)
-        print("ADC mode changed in flash; restart to use it!")
-        return
-'''
-
-def connect_to_wifi(ssid, password):
+def connect_to_hotspot():
+    count=1
     wlan = network.WLAN(network.STA_IF)
+    time.sleep_ms(100)
     if not wlan.isconnected():
         print("Connessione al WiFi...")
         wlan.active(True)
-        wlan.connect(ssid, password)
+        time.sleep_ms(100)
+        wlan.config(pm=wlan.PM_NONE)
+        time.sleep_ms(100)
+        wlan.connect(hotspot_config['ssid'], hotspot_config['password'])
         while not wlan.isconnected():
+            print("tentativo n˚: ", count)
+            count = count+1
+            time.sleep_ms(100)
             pass
-    print("Connesso al WiFi:", ssid)
+    print("configurazioni del network: ", wlan.ifconfig())
+    print("Connesso al WiFi:", hotspot_config['ssid'])
     print("Indirizzo IP:", wlan.ifconfig()[0])
     
-def register_gateway(gateway_id, gateway_key):
+def register_gateway():
     # Dettagli del gateway
     gateway_data = {
-        "gateway_id": gateway_id,
-        "key": gateway_key,
+        "gateway_id": ttn_config['gateway_id'],
+        "key": ttn_config['gateway_eui'],
         # Altri dettagli del gateway se necessario
     }
 
     # URL per registrare il gateway su TTN
     ttn_api_url = ttn_config['gateway_server_address']
-
     headers = {
         "Content-Type": "application/json",
         "Authorization": ttn_config['api_key']  # Sostituisci con il tuo token di accesso
     }
-
     try:
         response = requests.post(ttn_api_url, headers=headers, data=json.dumps(gateway_data))
+        time.sleep_ms(100)
         if response.status_code == 201:
             print("Gateway registrato con successo su TTN!")
         else:
             print("Errore durante la registrazione del gateway:", response.status_code, response.text)
     except Exception as e:
         print("Errore durante la richiesta:", e)
-
+    time.sleep_ms(100)
+    
 #check pins for spi
 def test_hardware_connections():
     print("Verifica collegamenti hardware:")
@@ -79,15 +70,8 @@ def test_power_supply():
     adc = ADC(Pin(lora_pin['power_supply']))  
     adc.atten(ADC.ATTN_11DB)
     voltage = adc.read() * 3.6 / 4095
-    
     print("Tensione vcc alimentazione:", vcc, "V /n")
     print("Tensione di alimentazione:", voltage, "V /n")
-'''
-    if 1.8 <= voltage <= 3.7:
-        print("Tensione di alimentazione nella gamma corretta")
-    else:
-        print("Attenzione: Tensione di alimentazione fuori dalla gamma consigliata")
-'''
     time.sleep_ms(100)
     
 def test_display_out():
