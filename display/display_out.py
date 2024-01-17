@@ -21,7 +21,7 @@ class DISPLAY_OUT:
         i2c = SoftI2C(scl=i2c_scl, sda=i2c_sda)
 
         # Create the display object
-        oled = SSD1306_I2C(oled_config['width'], oled_config['wight'], i2c)
+        oled = SSD1306_I2C(oled_config['width'], oled_config['weight'], i2c)
 
         oled.fill(0)
         y = 0
@@ -29,3 +29,5 @@ class DISPLAY_OUT:
             oled.text(row, 0, y)
             y += 20
         oled.show()
+
+

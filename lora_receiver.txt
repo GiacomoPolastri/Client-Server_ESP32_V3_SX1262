@@ -1,0 +1,40 @@
+from config.config_pin import lora_pin, lora_parameters
+from LoRa.sx1262 import SX1262
+from machine import Pin, SoftSPI
+import time
+
+def cb(events):
+    if events & SX1262.RX_DONE:
+        msg, err = sx.recv()
+        error = SX1262.STATUS[err]
+        print('Receive: {}, {}'.format(msg, error))
+    elif events & SX1262.TX_DONE:
+        print('TX done.')
+
+device_spi = SoftSPI(baudrate = 10000000,
+                     polarity = 0,
+                     phase = 0,
+                     bits = 8,
+                     firstbit = SoftSPI.MSB,
+                     sck = Pin(lora_pin['sck'],Pin.OUT, Pin.PULL_DOWN),
+                     mosi = Pin(lora_pin['mosi'], Pin.OUT, Pin.PULL_UP),
+                     miso = Pin(lora_pin['miso'], Pin.IN, Pin.PULL_UP))
+
+print (device_spi)
+print(type(device_spi))
+
+lora = SX1262(1,
+              clk=lora_pin['sck'],
+              mosi=lora_pin['mosi'],
+              miso=lora_pin['miso'],
+              cs=lora_pin['ss'],
+              irq=lora_pin['dio_0'],
+              rst=lora_pin['reset'],
+              gpio=lora_pin['gpio'])
+
+print (lora)
+print (type(lora))
+
+# LoRa
+lora.begin()
+
