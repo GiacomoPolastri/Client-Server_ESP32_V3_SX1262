@@ -7,8 +7,8 @@ def send(lora):
     counter = 0
     print("LoRa Sender")
     sensor = DHTSensor()
-    lora.setBlockingCallback(False, cb)
     while True:
+        lora.setBlockingCallback(False, cb)
         print("Send lora parameters", str(lora_parameters))
         package = bytes(str(lora_parameters),  'utf-8')
         lora.send(package)

@@ -21,7 +21,8 @@ lora_pin = {
 }
 
 lora_parameters = {
-    'frequency': 434.0, 
+    'frequency': 434,
+    'bw' : 500,
     'power': 14,
     'current_limit':60.0,
     'tx_power_level': 2, 
@@ -29,9 +30,6 @@ lora_parameters = {
     'spreading_factor': 8, 
     'coding_rate': 5, 
     'preamble_length': 8,
-    'implicit_header': False, 
     'implicit_len': 0xFF,
     'sync_word': 0x12, 
-    'enable_CRC': False,
-    'invert_IQ': False,
 }
