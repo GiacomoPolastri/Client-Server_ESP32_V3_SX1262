@@ -1,19 +1,18 @@
-import time
+from time import sleep_ms
 from machine import Pin, SoftI2C
 from display.ssd1306 import SSD1306_I2C
-from config.config_pin import *
+from config.config_pin import oled_config
 
-class DISPLAY_OUT:
+class display:
     def __init__(self, *rows):
         self.rows = rows
-        self.display_out()
+        self.display()
 
-    def display_out(self):
+    def display(self):
         i2c_rst = Pin(oled_config['rst'], Pin.OUT)
         i2c_rst.value(0)
-        time.sleep_ms(5)
+        sleep_ms(100)
         i2c_rst.value(1)
-    #device_config['sck']
         i2c_scl = Pin(oled_config['scl'], Pin.OUT, Pin.PULL_UP)
         i2c_sda = Pin(oled_config['sda'], Pin.OUT, Pin.PULL_UP)
 
