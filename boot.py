@@ -1,9 +1,14 @@
-from time import sleep_ms
-from connection.spi_connection import set_spi_connection, begin
-from connection.sender import receive
+# Importa il modulo sys per gestire l'input da tastiera
+import sys
 
-sx = set_spi_connection()
-sleep_ms(1000)
-begin(sx)
-sleep_ms(1000)
-receive(sx)
+# Chiede all'utente di inserire un valore
+print("Inserisci un valore:")
+
+# Legge il valore inserito dall'utente
+valore = sys.stdin.readline()
+
+# Rimuove eventuali caratteri di nuova linea alla fine del valore
+valore = valore.strip()
+
+# Stampa il valore inserito dall'utente
+print("Hai inserito:", valore)
