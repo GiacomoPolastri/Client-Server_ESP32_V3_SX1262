@@ -1,68 +1,72 @@
-from time import sleep_ms
+from time import sleep_ms, time
 from display.display_out import display
-from sensor.sensor_data import  DHTSensor
-from config.config_pin import lora_parameters
+from sensor.sensor_data import DHTSensor
 from LoRa.sx1262 import SX1262
 import sys
 import json
-from machine import reset
+from select import select
 
+def cb(events):
+    if events & SX1262.RX_DONE:
+        msg, err = lora.recv()
+        if len(msg) > 0:
+            error = SX1262.STATUS[err]
+            print('Receive: {}, {}'.format(msg, error))
+    elif events & SX1262.TX_DONE:
+        print('TX done.')
 
-def get_input(prompt):
-    value = sys.stdin.readline().strip()
-    return value
-
-def get_numeric_input(prompt):
+def get_input(prompt, default_value=0, timeout=5):
     print(prompt)
-    value = get_input(prompt)
+    start_time = time()
+    user_input = ""
+    
+    while time() - start_time < timeout:
+        if sys.stdin in select([sys.stdin], [], [], timeout)[0]:
+            user_input = sys.stdin.readline().strip()
+            if user_input:
+                return user_input
+
+    print(f"Timeout reached. Using default value: {default_value}")
+    return str(default_value)
+
+def get_numeric_input(prompt, default_value=0, timeout=5):
+    value = get_input(prompt, default_value, timeout)
     while not value.isdigit():
-        value = get_input(prompt)
+        value = get_input(prompt, default_value, timeout)
     return int(value)
 
-def receive(lora):
-    global sx, periodo_campionamento, orario_campionamento, n_campionamento
-    sx = lora
+def receive(sx):
+    
+    global lora
+    lora = sx
     
     # Periodo di campionamento
-    periodo_campionamento = get_numeric_input("Inserisci il periodo di campionamento:")
+    periodo_campionamento = get_numeric_input("Inserisci il periodo di campionamento in secondi:")
     print("Hai inserito:", periodo_campionamento)
-    
+
     # Orario in cui campionare
-    print
     orario_campionamento = get_numeric_input("Inserisci tra quante ore vuoi campionare :")
     print("Hai inserito:", orario_campionamento)
 
     # Numero di campioni da acquisire
     n_campionamento = get_numeric_input("Inserisci il numero di campioni da acquisire:")
     print("Hai inserito:", n_campionamento)
-   
+
     # Crea il pacchetto come dizionario
     packet = {
         "periodo_campionamento": periodo_campionamento,
         "orario_campionamento": orario_campionamento,
+        "n_campionamento": n_campionamento,
     }
-
-    # Converte il dizionario in una stringa JSON
-    j = json.dumps(packet)
-    #print("Pacchetto JSON:", j)
-    sx.send(bytes(json.dumps(j).encode()))
-            
+    if n_campionamento != 0:
+        lora.send(bytes(json.dumps(packet).encode()))
     print("Receiving")
-    display("Receiving")
-    lora.setBlockingCallback(False, cb)
-        
-def cb(events):
-    global sx, n_campionamento
-    if events & SX1262.RX_DONE:
-        print ("event true")
-        msg, err = sx.recv()
+    while n_campionamento != 0:
+        msg, err = lora.recv()
         if len(msg) > 0:
             error = SX1262.STATUS[err]
-            print(msg)
-            print(error)
-            display("receive", msg)
-            print (n_campionamento)
-            if (n_campionamento == 0):
-                reset()
-                print("resettato")
-            n_campionamento = n_campionamento-1
+            print('Receive: {}, {}'.format(msg, error))
+            n_campionamento = n_campionamento - 1
+            
+    lora.setBlockingCallback(False, cb)
+
