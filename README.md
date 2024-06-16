@@ -10,9 +10,8 @@ Welcome to the GitHub repository for the LoRa Communication System project. This
 2. [System Architecture](#system-architecture)
 3. [File Descriptions](#file-descriptions)
 4. [Installation and Setup](#installation-and-setup)
-5. [Usage](#usage)
-6. [Contributing](#contributing)
-7. [License](#license)
+5. [Contributing](#contributing)
+6. [License](#license)
 
 ## Introduction
 This project aims to develop a client-server system using the LoRa protocol to facilitate communication and data exchange between ESP32 LoRa-based IoT devices. It employs the LoRa SX1262 module for long-range data transmission with low power consumption, integrated with an SSD1306 OLED display for data visualization and a DHT11 sensor for temperature and humidity detection.
