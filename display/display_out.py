@@ -26,7 +26,5 @@ class display:
         y = 0
         for row in self.rows:
             oled.text(row, 0, y)
-            y += 20
+            y += 12
         oled.show()
-
-

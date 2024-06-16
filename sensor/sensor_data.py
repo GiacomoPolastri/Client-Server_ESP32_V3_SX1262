@@ -7,18 +7,32 @@ class DHTSensor:
 
     def __init__(self):
         self.pin_data = self.Pin_Data
-        self.sensor = dht.DHT11(Pin(self.pin_data))
+        try:
+            self.sensor = dht.DHT11(Pin(self.pin_data))
+            print("DHT11 sensor initialized successfully.")
+        except Exception as e:
+            print(f"Error initializing DHT11 sensor: {e}")
 
     def measure(self):
-        self.sensor.measure()
-        temperature = self.sensor.temperature()
-        humidity = self.sensor.humidity()
-        return temperature, humidity
+        try:
+            self.sensor.measure()
+            temperature = self.sensor.temperature()
+            humidity = self.sensor.humidity()
+            return temperature, humidity
+        except Exception as e:
+            print(f"Error measuring DHT11 sensor: {e}")
+            return None, None
 
     def get_temperature(self):
         temperature, _ = self.measure()
-        return temperature
+        if temperature is not None:
+            return temperature
+        else:
+            print("Unable to retrieve temperature.")
 
     def get_humidity(self):
         _, humidity = self.measure()
-        return humidity
+        if humidity is not None:
+            return humidity
+        else:
+            print("Unable to retrieve humidity.")
