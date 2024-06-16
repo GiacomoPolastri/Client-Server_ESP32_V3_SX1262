@@ -1,4 +1,4 @@
-from sx1262 import SX1262
+from LoRa.sx1262 import SX1262
 import time
 
 def cb(events):
@@ -11,9 +11,11 @@ def cb(events):
     elif events & SX1262.TX_DONE:
         print('TX done.')
 
+print("create sx")
 sx = SX1262(spi_bus=1, clk=9, mosi=10, miso=11, cs=8, irq=14, rst=12, gpio=13)
 
 # LoRa
+print ("start with begin")
 sx.begin(freq=434, bw=500.0, sf=12, cr=8, syncWord=0x12,
          power=-5, currentLimit=60.0, preambleLength=8,
          implicit=False, implicitLen=0xFF,

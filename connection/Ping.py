@@ -1,4 +1,4 @@
-from sx1262 import SX1262
+from LoRa.sx1262 import SX1262
 import time
 
 def cb(events):
