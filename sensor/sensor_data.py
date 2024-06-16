@@ -2,6 +2,7 @@ from machine import Pin
 import dht
 import time
 
+
 class DHTSensor:
     Pin_Data = const(48)
 
