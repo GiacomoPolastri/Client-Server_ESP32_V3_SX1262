@@ -1,19 +1,10 @@
-from time import sleep_ms, time
+from time import time
 from display.display_out import display
 from sensor.sensor_data import DHTSensor
 from LoRa.sx1262 import SX1262
 import sys
 import json
 from select import select
-
-def cb(events):
-    if events & SX1262.RX_DONE:
-        msg, err = lora.recv()
-        if len(msg) > 0:
-            error = SX1262.STATUS[err]
-            print('Receive: {}, {}'.format(msg, error))
-    elif events & SX1262.TX_DONE:
-        print('TX done.')
 
 def get_input(prompt, default_value=0, timeout=5):
     print(prompt)
@@ -36,37 +27,64 @@ def get_numeric_input(prompt, default_value=0, timeout=5):
     return int(value)
 
 def receive(sx):
-    
-    global lora
+    global lora, array_data
+    array_data = []
     lora = sx
     
-    # Periodo di campionamento
-    periodo_campionamento = get_numeric_input("Inserisci il periodo di campionamento in secondi:")
-    print("Hai inserito:", periodo_campionamento)
+    # Sampling period
+    sampling_period = get_numeric_input("Enter the sampling period in seconds:")
+    print("You entered:", sampling_period)
 
-    # Orario in cui campionare
-    orario_campionamento = get_numeric_input("Inserisci tra quante ore vuoi campionare :")
-    print("Hai inserito:", orario_campionamento)
+    # Sampling time
+    sampling_time = get_numeric_input("Enter after how many hours you want to sample:")
+    print("You entered:", sampling_time)
 
-    # Numero di campioni da acquisire
-    n_campionamento = get_numeric_input("Inserisci il numero di campioni da acquisire:")
-    print("Hai inserito:", n_campionamento)
+    # Number of samples to acquire
+    n_samples = get_numeric_input("Enter the number of samples to acquire:")
+    print("You entered:", n_samples)
 
-    # Crea il pacchetto come dizionario
+    # Create packet dictionary
     packet = {
-        "periodo_campionamento": periodo_campionamento,
-        "orario_campionamento": orario_campionamento,
-        "n_campionamento": n_campionamento,
+        "sampling_period": sampling_period,
+        "sampling_time": sampling_time,
+        "n_samples": n_samples,
     }
-    if n_campionamento != 0:
+
+    request = False  # Initialize the request variable
+    
+    if n_samples != 0:
         lora.send(bytes(json.dumps(packet).encode()))
-    print("Receiving")
-    while n_campionamento != 0:
+        request = True 
+    else:
+        n_samples = n_samples + 1  # Increment n_samples if it is zero
+
+    print("Receiving...")
+    display("Receiving...")
+    
+    while n_samples != 0:
         msg, err = lora.recv()
         if len(msg) > 0:
             error = SX1262.STATUS[err]
             print('Receive: {}, {}'.format(msg, error))
-            n_campionamento = n_campionamento - 1
+            try:
+                message = json.loads(msg)
+                if all (key in message for key in ['temperature', 'humidity']):
+                    
+                    display ('Receive',
+                             'Temperature',
+                             str(message['temperature']),
+                             'Humidity',
+                             str(message['humidity']))
+                else:
+                    display('Receive',msg)
+            except Exception as e:
+                print(f"Error decoding JSON: {e}")    
+                display('Receive',msg)
             
-    lora.setBlockingCallback(False, cb)
+            if request:
+                array_data.append(msg)
+            n_samples -= 1
 
+    if request:
+        print(array_data)
+        request = False
