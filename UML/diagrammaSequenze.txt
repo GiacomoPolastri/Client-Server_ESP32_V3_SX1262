@@ -1,0 +1,29 @@
+@startuml
+participant "Client" as Client
+participant "Server" as Server
+participant "LoRa SX1262" as LoRa
+participant "Display OLED" as Display
+participant "DHT11" as Sensor
+
+Client -> Server : Richiesta di configurazione (JSON)
+Server -> LoRa : Invia pacchetto di configurazione (JSON)
+LoRa -> Client : Trasmette pacchetto di configurazione
+Client -> Sensor : Rileva dati di temperatura e umidità
+Sensor -> Client : Restituisce dati rilevati
+Client -> LoRa : Invia dati rilevati (JSON)
+LoRa -> Server : Trasmette dati rilevati
+Server -> Display : Visualizza dati ricevuti
+
+alt Campionamento continuo
+    loop fino a n_campionamenti
+        Client -> Sensor : Rileva dati di temperatura e umidità
+        Sensor -> Client : Restituisce dati rilevati
+        Client -> LoRa : Invia dati rilevati (JSON)
+        LoRa -> Server : Trasmette dati rilevati
+        Server -> Display : Visualizza dati ricevuti
+    end
+end
+
+Server -> Client : Conferma ricezione dati
+@enduml
+

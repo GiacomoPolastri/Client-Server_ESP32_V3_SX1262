@@ -1,0 +1,67 @@
+@startuml
+class Display {
+  +__init__(*rows)
+  +display()
+  -i2c_rst: Pin
+  -i2c_scl: Pin
+  -i2c_sda: Pin
+  -i2c: SoftI2C
+  -oled: SSD1306_I2C
+}
+
+class DHTSensor {
+  -pin_data: int
+  -sensor: DHT11
+  +__init__()
+  +measure() : (temperature, humidity)
+  +get_temperature() : temperature
+  +get_humidity() : humidity
+}
+
+class SX1262 {
+  +begin(params)
+  +set_spi_connection()
+  +cb(events)
+  -spi_bus: int
+  -clk: Pin
+  -miso: Pin
+  -mosi: Pin
+  -cs: Pin
+  -rst: Pin
+  -irq: Pin
+  -gpio: Pin
+}
+
+class Config {
+  +oled_config: dict
+  +lora_pin: dict
+  +lora_parameters: dict
+}
+
+class ClientSender {
+  +__init__()
+  +send_data()
+  +receive_config()
+  -display: Display
+  -sensor: DHTSensor
+  -lora: SX1262
+}
+
+class ServerReceiver {
+  +__init__()
+  +receive_data()
+  +send_config()
+  -display: Display
+  -lora: SX1262
+}
+
+Config <|-- Display
+Config <|-- DHTSensor
+Config <|-- SX1262
+ClientSender --> Display
+ClientSender --> DHTSensor
+ClientSender --> SX1262
+ServerReceiver --> Display
+ServerReceiver --> SX1262
+
+@enduml
