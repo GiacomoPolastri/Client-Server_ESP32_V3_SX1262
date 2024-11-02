@@ -5,25 +5,24 @@ participant "LoRa SX1262" as LoRa
 participant "Display OLED" as Display
 participant "DHT11" as Sensor
 
-Client -> Server : Richiesta di configurazione (JSON)
-Server -> LoRa : Invia pacchetto di configurazione (JSON)
-LoRa -> Client : Trasmette pacchetto di configurazione
-Client -> Sensor : Rileva dati di temperatura e umidità
-Sensor -> Client : Restituisce dati rilevati
-Client -> LoRa : Invia dati rilevati (JSON)
-LoRa -> Server : Trasmette dati rilevati
-Server -> Display : Visualizza dati ricevuti
+Client -> Server : Configuration request (JSON)
+Server -> LoRa : Sends configuration packet (JSON)
+LoRa -> Client : Transmits configuration packet
+Client -> Sensor : Reads temperature and humidity data
+Sensor -> Client : Returns detected data
+Client -> LoRa : Sends detected data (JSON)
+LoRa -> Server : Transmits detected data
+Server -> Display : Displays received data
 
-alt Campionamento continuo
-    loop fino a n_campionamenti
-        Client -> Sensor : Rileva dati di temperatura e umidità
-        Sensor -> Client : Restituisce dati rilevati
-        Client -> LoRa : Invia dati rilevati (JSON)
-        LoRa -> Server : Trasmette dati rilevati
-        Server -> Display : Visualizza dati ricevuti
+alt Continuous sampling
+    loop until n_samples
+        Client -> Sensor : Reads temperature and humidity data
+        Sensor -> Client : Returns detected data
+        Client -> LoRa : Sends detected data (JSON)
+        LoRa -> Server : Transmits detected data
+        Server -> Display : Displays received data
     end
 end
 
-Server -> Client : Conferma ricezione dati
+Server -> Client : Acknowledgment of data reception
 @enduml
-
