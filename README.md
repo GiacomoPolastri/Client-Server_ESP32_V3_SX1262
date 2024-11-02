@@ -29,7 +29,7 @@ The system consists of the following main components:
 ![image](https://github.com/user-attachments/assets/ea25eb12-d977-4ccf-86be-0c0d0b03b4b2)
 
 ## Sequence Diagram
-![image](https://github.com/user-attachments/assets/28c126fa-41b2-4984-90db-3298aa858e60)
+![image](https://github.com/user-attachments/assets/f198ed52-b3ba-4b62-8353-bb45f81e81d9)
 
 ## File Descriptions
 
